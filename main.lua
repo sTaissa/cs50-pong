@@ -109,5 +109,14 @@ function love.draw() --draw something in the screen, after it was updated
     paddle1:render()
     paddle2:render()
 
+    displayFPS()
+
     push:apply('end')
+end
+
+function displayFPS()
+    love.graphics.setColor(0, 1, 0, 1)
+    love.graphics.setFont(smallFont)
+    love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 40, 20) --.. is concatenating string
+    love.graphics.setColor(1, 1, 1, 1)
 end
