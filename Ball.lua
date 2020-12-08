@@ -11,6 +11,18 @@ function Ball:init(x, y, width, height)
     self.dy = math.random(-50, 50) --random between it gives us many angles
 end
 
+function Ball:collides(box)
+    if self.x > box.x + box.width or self.x + self.width < box.x then --condition that i don't understand but works
+        return false
+    end
+
+    if self.y > box.y + box.height or self.y + self.height < box.y then
+        return false
+    end
+
+    return true
+end
+
 function Ball:reset()
     --initial value of ball
     self.x = VIRTUAL_WIDTH / 2 - 2 --its '-2' because it is on middle, but projected to right and the half of the ball size solve this

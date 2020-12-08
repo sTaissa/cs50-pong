@@ -42,11 +42,27 @@ end
 
 --function to move the rectangles(while is pressed or 'down')
 function love.update(dt) --dt = delta time, to standardize speed and frames
+    --ball reflection
+    if ball:collides(paddle1) then
+        ball.dx = -ball.dx --deflect ball to the right
+    end
+    if ball:collides(paddle2) then
+        ball.dx = -ball.dx --deflect ball to the left
+    end
+
+    if ball.y <= 0 then
+        ball.dy = -ball.dy --deflect the ball down
+        ball.y = 0 --solve bug of being y above 0 in slow pc
+    end
+    if ball.y >= VIRTUAL_HEIGHT - 4 then
+        ball.dy = -ball.dy --deflect the ball up
+        ball.y = VIRTUAL_HEIGHT - 4
+    end
 
     paddle1:update(dt)
     paddle2:update(dt)
 
-    --player 1 moviment
+    --player 1 movement
     if love.keyboard.isDown('w') then
         paddle1.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('s') then
@@ -55,7 +71,7 @@ function love.update(dt) --dt = delta time, to standardize speed and frames
         paddle1.dy = 0
     end
 
-    --player 2 moviment
+    --player 2 movement
     if love.keyboard.isDown('up') then
         paddle2.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('down') then
