@@ -21,11 +21,13 @@ function love.load() --basical love function to initialize the game
 
     smallFont = love.graphics.newFont('04B_03__.TTF', 8) --add the font as an object
     scoreFont = love.graphics.newFont('04B_03__.TTF', 32) -- add a larger font
+    victoryFont = love.graphics.newFont('04B_03__.TTF', 24)
 
     player1score = 0
     player2score = 0
 
     servingPlayer = math.random(2) == 1 and 1 or 2 --random pointing to some player 
+    winningPlayer = 0 --no one has already won
 
     --initial value of player1 and player2
     paddle1 = Paddle(5, 20, 5, 20)
@@ -55,19 +57,30 @@ function love.update(dt) --dt = delta time, to standardize speed and frames
     if gameState == 'play' then 
 
         --updating the score
-        if ball.x <= 0 then
+        if ball.x <= 0 then --player2 points
             player2score = player2score + 1
             servingPlayer = 1
             ball:reset()
-            ball.dx = 100
-            gameState = 'serve'
+            
+            if player2score >= 2 then
+                gameState = 'victory'
+                winningPlayer = 2
+            else 
+                gameState = 'serve'
+            end
         end
-        if ball.x >= VIRTUAL_WIDTH - 4 then
+
+        if ball.x >= VIRTUAL_WIDTH - 4 then --player1 points
             player1score = player1score + 1
             servingPlayer = 2
             ball:reset()
-            ball.dx = -100
-            gameState = 'serve'
+            
+            if player1score >= 2 then
+                gameState = 'victory'
+                winningPlayer = 1
+            else 
+                gameState = 'serve'
+            end
         end
 
         --ball reflection
@@ -117,6 +130,10 @@ function love.keypressed(key) --function to quit when esc pressed(once its execu
     elseif key == 'enter' or key == 'return' then
         if gameState == 'start' then
             gameState = 'serve'
+        elseif gameState == 'victory' then
+            gameState = 'start'
+            player1score = 0
+            player2score = 0
         elseif gameState == 'serve' then
             gameState = 'play'
         end
@@ -133,12 +150,18 @@ function love.draw() --draw something in the screen, after it was updated
     --set the fonts to their right places
     love.graphics.setFont(smallFont) 
 
+    --draw the state messages 
     if gameState == 'start' then 
-        love.graphics.printf("Welcome to Pong!", 0, 20, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf("Press enter to Play!", 0, 32, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf("Welcome to Pong!", 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf("Press enter to begin!", 0, 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'serve' then
-        love.graphics.printf("Player " .. tostring(servingPlayer) .. "'s turn", 0, 20, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf("Press enter to Serve!", 0, 32, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf("Player " .. tostring(servingPlayer) .. "'s serve", 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf("Press enter to serve!", 0, 20, VIRTUAL_WIDTH, 'center')
+    elseif gameState == 'victory' then
+        love.graphics.setFont(victoryFont)
+        love.graphics.printf("Player " .. tostring(winningPlayer) .. " wins", 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.setFont(smallFont)
+        love.graphics.printf("Press enter to restart!", 0, 42, VIRTUAL_WIDTH, 'center')
     end
 
     love.graphics.setFont(scoreFont)
