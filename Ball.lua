@@ -12,7 +12,7 @@ function Ball:init(x, y, width, height)
 end
 
 function Ball:collides(box)
-    if self.x > box.x + box.width or self.x + self.width < box.x then --condition that i don't understand but works
+    if self.x > box.x + box.width or self.x + self.width < box.x then --condition that i don't understand but works id the rectangles don't rotate
         return false
     end
 

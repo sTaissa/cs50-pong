@@ -13,9 +13,11 @@ require 'Ball'
 require 'Paddle'
 
 function love.load() --basical love function to initialize the game
-    math.randomseed(os.time())
+    math.randomseed(os.time()) --using the count of time to random things
 
     love.graphics.setDefaultFilter('nearest', 'nearest') --using the nearest neighbor function to zoom the image(letters) without bluring it
+
+    love.window.setTitle("Pong") --title of the window
 
     smallFont = love.graphics.newFont('04B_03__.TTF', 8) --add the font as an object
     scoreFont = love.graphics.newFont('04B_03__.TTF', 32) -- add a larger font
@@ -42,47 +44,58 @@ end
 
 --function to move the rectangles(while is pressed or 'down')
 function love.update(dt) --dt = delta time, to standardize speed and frames
-    --ball reflection
-    if ball:collides(paddle1) then
-        ball.dx = -ball.dx --deflect ball to the right
-    end
-    if ball:collides(paddle2) then
-        ball.dx = -ball.dx --deflect ball to the left
-    end
+    if gameState == 'play' then 
 
-    if ball.y <= 0 then
-        ball.dy = -ball.dy --deflect the ball down
-        ball.y = 0 --solve bug of being y above 0 in slow pc
-    end
-    if ball.y >= VIRTUAL_HEIGHT - 4 then
-        ball.dy = -ball.dy --deflect the ball up
-        ball.y = VIRTUAL_HEIGHT - 4
-    end
+        --updating the score
+        if ball.x <= 0 then
+            player2score = player2score + 1
+            ball:reset()
+            gameState = 'start'
+        end
+        if ball.x >= VIRTUAL_WIDTH - 4 then
+            player1score = player1score + 1
+            ball:reset()
+            gameState = 'start'
+        end
 
-    paddle1:update(dt)
-    paddle2:update(dt)
+        --ball reflection
+        if ball:collides(paddle1) then
+            ball.dx = -ball.dx --deflect ball to the right
+        end
+        if ball:collides(paddle2) then
+            ball.dx = -ball.dx --deflect ball to the left
+        end
 
-    --player 1 movement
-    if love.keyboard.isDown('w') then
-        paddle1.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('s') then
-        paddle1.dy = PADDLE_SPEED
-    else
-        paddle1.dy = 0
-    end
+        if ball.y <= 0 then
+            ball.dy = -ball.dy --deflect the ball down
+            ball.y = 0 --solve bug of being y above 0 in slow pc
+        end
+        if ball.y >= VIRTUAL_HEIGHT - 4 then
+            ball.dy = -ball.dy --deflect the ball up
+            ball.y = VIRTUAL_HEIGHT - 4
+        end
 
-    --player 2 movement
-    if love.keyboard.isDown('up') then
-        paddle2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        paddle2.dy = PADDLE_SPEED
-    else
-        paddle2.dy = 0
-    end
+        --player 1 movement
+        if love.keyboard.isDown('w') then
+            paddle1.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('s') then
+            paddle1.dy = PADDLE_SPEED
+        else
+            paddle1.dy = 0
+        end
 
-    --ball moviment
-    if gameState == 'play' then
-        ball:update(dt)
+        --player 2 movement
+        if love.keyboard.isDown('up') then
+            paddle2.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('down') then
+            paddle2.dy = PADDLE_SPEED
+        else
+            paddle2.dy = 0
+        end
+
+        ball:update(dt) --ball movement
+        paddle1:update(dt) --paddle1 movement
+        paddle2:update(dt) --paddle2movement
     end
 end
 
@@ -92,9 +105,6 @@ function love.keypressed(key) --function to quit when esc pressed(once its execu
     elseif key == 'enter' or key == 'return' then
         if gameState == 'start' then
             gameState = 'play'
-        elseif gameState == 'play' then
-            gameState = 'start'
-            ball:reset()
         end
     end
 end
@@ -108,11 +118,6 @@ function love.draw() --draw something in the screen, after it was updated
 
     --set the fonts to their right places
     love.graphics.setFont(smallFont) 
-    if gameState == 'start' then
-        love.graphics.printf('Hello Start State', 0, 20, VIRTUAL_WIDTH, 'center')
-    elseif gameState == 'play' then
-        love.graphics.printf('Hello Play State', 0, 20, VIRTUAL_WIDTH, 'center')
-    end
 
     love.graphics.setFont(scoreFont)
     love.graphics.print(player1score, VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
