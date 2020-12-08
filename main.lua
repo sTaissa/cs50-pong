@@ -25,12 +25,20 @@ function love.load() --basical love function to initialize the game
     player1score = 0
     player2score = 0
 
+    servingPlayer = math.random(2) == 1 and 1 or 2 --random pointing to some player 
+
     --initial value of player1 and player2
     paddle1 = Paddle(5, 20, 5, 20)
     paddle2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT -30, 5, 20)
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / -2, 5, 5)
 
     ball:reset()
+
+    if servingPlayer == 1 then --making sure the velocity is te right side(the side of the player that scores)
+        ball.dx = 100
+    else 
+        ball.dx = -100
+    end
 
     gameState = 'start'
 
@@ -49,13 +57,17 @@ function love.update(dt) --dt = delta time, to standardize speed and frames
         --updating the score
         if ball.x <= 0 then
             player2score = player2score + 1
+            servingPlayer = 1
             ball:reset()
-            gameState = 'start'
+            ball.dx = 100
+            gameState = 'serve'
         end
         if ball.x >= VIRTUAL_WIDTH - 4 then
             player1score = player1score + 1
+            servingPlayer = 2
             ball:reset()
-            gameState = 'start'
+            ball.dx = -100
+            gameState = 'serve'
         end
 
         --ball reflection
@@ -104,6 +116,8 @@ function love.keypressed(key) --function to quit when esc pressed(once its execu
         love.event.quit()
     elseif key == 'enter' or key == 'return' then
         if gameState == 'start' then
+            gameState = 'serve'
+        elseif gameState == 'serve' then
             gameState = 'play'
         end
     end
@@ -118,6 +132,14 @@ function love.draw() --draw something in the screen, after it was updated
 
     --set the fonts to their right places
     love.graphics.setFont(smallFont) 
+
+    if gameState == 'start' then 
+        love.graphics.printf("Welcome to Pong!", 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf("Press enter to Play!", 0, 32, VIRTUAL_WIDTH, 'center')
+    elseif gameState == 'serve' then
+        love.graphics.printf("Player " .. tostring(servingPlayer) .. "'s turn", 0, 20, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf("Press enter to Serve!", 0, 32, VIRTUAL_WIDTH, 'center')
+    end
 
     love.graphics.setFont(scoreFont)
     love.graphics.print(player1score, VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
