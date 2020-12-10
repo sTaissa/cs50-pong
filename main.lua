@@ -23,6 +23,12 @@ function love.load() --basical love function to initialize the game
     scoreFont = love.graphics.newFont('04B_03__.TTF', 32) -- add a larger font
     victoryFont = love.graphics.newFont('04B_03__.TTF', 24)
 
+    sounds = {
+        ['paddleHit'] = love.audio.newSource('paddleHit.wav', 'static'),
+        ['pointScored'] = love.audio.newSource('pointScored.wav', 'static'),
+        ['wallHit'] = love.audio.newSource('wallHit.wav', 'static')
+    }
+
     player1score = 0
     player2score = 0
 
@@ -60,6 +66,7 @@ function love.update(dt) --dt = delta time, to standardize speed and frames
         if ball.x <= 0 then --player2 points
             player2score = player2score + 1
             servingPlayer = 1
+            sounds['pointScored']:play()
             ball:reset()
             
             if player2score >= 2 then
@@ -73,6 +80,7 @@ function love.update(dt) --dt = delta time, to standardize speed and frames
         if ball.x >= VIRTUAL_WIDTH - 4 then --player1 points
             player1score = player1score + 1
             servingPlayer = 2
+            sounds['pointScored']:play()
             ball:reset()
             
             if player1score >= 2 then
@@ -86,18 +94,29 @@ function love.update(dt) --dt = delta time, to standardize speed and frames
         --ball reflection
         if ball:collides(paddle1) then
             ball.dx = -ball.dx --deflect ball to the right
+            ball.x = paddle1.x + 5
+
+            sounds['paddleHit']:play() --sound when ball colides with the paddle
         end
         if ball:collides(paddle2) then
             ball.dx = -ball.dx --deflect ball to the left
+            ball.x = paddle2.x - 4
+
+            sounds['paddleHit']:play()
         end
 
+        --detect upper and lower screen boundary collision and reverse if collised
         if ball.y <= 0 then
             ball.dy = -ball.dy --deflect the ball down
             ball.y = 0 --solve bug of being y above 0 in slow pc
+
+            sounds['wallHit']:play()
         end
         if ball.y >= VIRTUAL_HEIGHT - 4 then
             ball.dy = -ball.dy --deflect the ball up
             ball.y = VIRTUAL_HEIGHT - 4
+
+            sounds['wallHit']:play()
         end
 
         --player 1 movement
