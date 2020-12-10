@@ -54,8 +54,12 @@ function love.load() --basical love function to initialize the game
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false, --no fullscreen, just a window
         vsync = true, --syncronyze with the monitor
-        resizable = false --can't resize the window
+        resizable = true --can resize the window
     })
+end
+
+function love.resize(w, h)
+    push:resize(w,h)
 end
 
 --function to move the rectangles(while is pressed or 'down')
