@@ -207,6 +207,13 @@ function love.update(dt)
         player1.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('s') then
         player1.dy = PADDLE_SPEED
+    elseif ball.dx < 0 and gameState == 'play' then
+        if player1.y > ball.y then
+            player1.dy = -PADDLE_SPEED
+         
+        elseif player1.y < ball.y then
+            player1.dy = PADDLE_SPEED
+         end
     else
         player1.dy = 0
     end
